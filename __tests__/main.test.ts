@@ -4,7 +4,7 @@ import * as path from 'path'
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', () => {
-  process.env['INPUT_PROJECTPATH'] = '__tests__\UnityProject_5.6.1f1'
+  process.env['GITHUB_WORKSPACE'] = '__tests__/UnityProject_5.6.1f1'
   const ip = path.join(__dirname, '..', 'lib', 'main.js')
   const options: cp.ExecSyncOptions = {
     env: process.env
