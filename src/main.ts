@@ -20,7 +20,7 @@ async function run(): Promise<void> {
     const contents = fs.readFileSync(versionFilePath).toString();
     const parsed = yaml.safeLoad(contents);
     const editorVersion = parsed.m_EditorVersion as string;
-    const unityVersionPattern:RegExp = /^\d+\.\d+\.\d+f\d+$/m;
+    const unityVersionPattern = /^\d+\.\d+\.\d+f\d+$/m;
     if(!unityVersionPattern.test(editorVersion))
     {
       throw new Error('Read version failed. Project is not exists or invalid format.')
