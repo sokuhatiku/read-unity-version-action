@@ -25,6 +25,7 @@ test('without projectPath input(5.6.1f1)', () => {
     { GITHUB_WORKSPACE:'__tests__/UnityProject_5.6.1f1' },
     process.env
   )
+  console.log(customEnv.GITHUB_WORKSPACE)
   expect(execWithCustomEnv(customEnv))
     .toContain('::set-output name=editorVersion::5.6.1f1')
 })
