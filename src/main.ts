@@ -1,16 +1,20 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import path from 'path'
+import yaml from 'yaml'
+import fs from 'fs'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const projectPath = core.getInput('projectPath') ?? process.env.GITHUB_WORKSPACE;
+    console.log(`project path is ${projectPath}`);
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const versionFilePath =  path.join(projectPath, '/ProjectSettings/ProjectVersion.txt');
+    const contents = fs.readFileSync(versionFilePath).toString();
+    const parsed = yaml.parse(contents);
+    const editorVersion = parsed.m_EditorVersion as string;
 
-    core.setOutput('time', new Date().toTimeString())
+    core.setOutput('editorVersion', editorVersion);
+
   } catch (error) {
     core.setFailed(error.message)
   }
