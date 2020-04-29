@@ -15,7 +15,7 @@ async function run(): Promise<void> {
     const versionFilePath =  path.join(projectPath, 'ProjectSettings/ProjectVersion.txt');
     if(!fs.existsSync(versionFilePath))
     {
-      throw new Error('The version file not exists. Project is not exists or invalid format.')
+      throw new Error(`The version file not exists into ${versionFilePath}. Project is not exists or invalid format.`)
     }
     const contents = fs.readFileSync(versionFilePath).toString();
     const parsed = yaml.safeLoad(contents);
