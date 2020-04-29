@@ -1184,12 +1184,14 @@ const path_1 = __importDefault(__webpack_require__(622));
 const yaml_1 = __importDefault(__webpack_require__(521));
 const fs_1 = __importDefault(__webpack_require__(747));
 function run() {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const projectPath = (_a = core.getInput('projectPath'), (_a !== null && _a !== void 0 ? _a : process.env.GITHUB_WORKSPACE));
+            const projectPath = core.getInput('projectPath') || process.env.GITHUB_WORKSPACE;
+            if (!projectPath) {
+                throw new Error('project path is undefined');
+            }
             console.log(`project path is ${projectPath}`);
-            const versionFilePath = path_1.default.join(projectPath, '/ProjectSettings/ProjectVersion.txt');
+            const versionFilePath = path_1.default.join(projectPath, 'ProjectSettings/ProjectVersion.txt');
             const contents = fs_1.default.readFileSync(versionFilePath).toString();
             const parsed = yaml_1.default.parse(contents);
             const editorVersion = parsed.m_EditorVersion;
