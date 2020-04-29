@@ -10,13 +10,13 @@ async function run(): Promise<void> {
     {
       throw new Error('project path is undefined');
     }
-    console.log(`project path is \"${projectPath}\"`);
+    console.log(`project path is "${projectPath}"`);
 
     const versionFilePath =  path.join(projectPath, 'ProjectSettings/ProjectVersion.txt');
     const contents = fs.readFileSync(versionFilePath).toString();
     const parsed = yaml.safeLoad(contents);
     const editorVersion = parsed.m_EditorVersion as string;
-    console.log(`project version is \"${editorVersion}\"`);
+    console.log(`project version is "${editorVersion}"`);
 
     core.setOutput('editorVersion', editorVersion);
 
