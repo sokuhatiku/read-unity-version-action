@@ -30,6 +30,7 @@ async function run(): Promise<void> {
     core.setOutput('editorVersion', editorVersion);
 
   } catch (error) {
+    console.error(error)
     core.setFailed(error.message)
   }
 }
