@@ -4515,7 +4515,7 @@ class UnityVersion {
         return `${this.first}.${this.second}.${this.third}f${this.fourth}`;
     }
     static Parse(text) {
-        const pattern = /^(\d+)\.(\d+)\.(\d+)f(\d+)$/m;
+        const pattern = /^(\d+)\.(\d+)\.(\d+)[fba](\d+)$/m;
         const match = text.match(pattern);
         if (match == null) {
             throw new Error('文字列がUnityのバージョンパターンに一致しません。');

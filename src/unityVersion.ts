@@ -11,7 +11,7 @@ export class UnityVersion {
   }
 
   static Parse(text: String): UnityVersion {
-    const pattern = /^(\d+)\.(\d+)\.(\d+)f(\d+)$/m
+    const pattern = /^(\d+)\.(\d+)\.(\d+)[fba](\d+)$/m
 
     const match = text.match(pattern)
     if (match == null) {
