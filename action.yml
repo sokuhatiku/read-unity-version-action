@@ -1,6 +1,9 @@
 name: 'Read Unity version'
 description: 'Reads Unity editor version required by project.'
 author: 'Sokuhatiku'
+branding:
+  icon: 'search'
+  color: 'gray-dark'
 inputs:
   projectPath:
     required: false
