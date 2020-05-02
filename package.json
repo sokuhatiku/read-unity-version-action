@@ -2,7 +2,7 @@
   "name": "read-unity-version-action",
   "version": "1.0.0",
   "private": true,
-  "description": "A GitHub action to reads Unity editor version requested by project.",
+  "description": "A GitHub action to Reads Unity editor version required by project.",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",

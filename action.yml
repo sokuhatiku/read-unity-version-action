@@ -1,5 +1,5 @@
 name: 'Read Unity version'
-description: 'A GitHub action to reads Unity editor version requested by project.'
+description: 'Reads Unity editor version required by project.'
 author: 'Sokuhatiku'
 inputs:
   projectPath:
