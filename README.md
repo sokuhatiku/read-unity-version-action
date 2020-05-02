@@ -1,6 +1,6 @@
 ![build-test](https://github.com/sokuhatiku/read-unity-version-action/workflows/build-test/badge.svg)
 
-# Read unity version action
+# Read Unity version action
 
 This action gets the version of Unity Editor required by your project and make it usable at after steps.
 
