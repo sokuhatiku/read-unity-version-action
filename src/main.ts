@@ -1,7 +1,5 @@
 import * as core from '@actions/core'
-import path from 'path'
-import yaml from 'js-yaml'
-import fs from 'fs'
+import { UnityVersionDescribedFile } from './unityVersionDescribedFile'
 
 async function run(): Promise<void> {
   try {
@@ -12,22 +10,11 @@ async function run(): Promise<void> {
     }
     console.log(`project path is "${projectPath}"`);
 
-    const versionFilePath =  path.join(projectPath, 'ProjectSettings/ProjectVersion.txt');
-    if(!fs.existsSync(versionFilePath))
-    {
-      throw new Error('The version file not exists. Project is not exists or invalid format.')
-    }
-    const contents = fs.readFileSync(versionFilePath).toString();
-    const parsed = yaml.safeLoad(contents);
-    const editorVersion = parsed.m_EditorVersion as string;
-    const unityVersionPattern = /^\d+\.\d+\.\d+f\d+$/m;
-    if(!unityVersionPattern.test(editorVersion))
-    {
-      throw new Error('Read version failed. Project is not exists or invalid format.')
-    }
-    console.log(`project version is "${editorVersion}"`);
+    const versionFile = UnityVersionDescribedFile.ExploreSync(projectPath)
+    const version = versionFile.version;
 
-    core.setOutput('editorVersion', editorVersion);
+    console.log(`project version is "${version}"`);
+    core.setOutput('editorVersion', version.toString());
 
   } catch (error) {
     core.setFailed(error.message)
