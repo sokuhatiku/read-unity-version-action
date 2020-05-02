@@ -4505,26 +4505,28 @@ module.exports = Type;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 class UnityVersion {
-    constructor(first, second, third, fourth) {
+    constructor(first, second, third, fourth, releaseType) {
         this.first = first;
         this.second = second;
         this.third = third;
         this.fourth = fourth;
+        this.releaseType = releaseType;
     }
     toString() {
-        return `${this.first}.${this.second}.${this.third}f${this.fourth}`;
+        return `${this.first}.${this.second}.${this.third}${this.releaseType}${this.fourth}`;
     }
     static Parse(text) {
-        const pattern = /^(\d+)\.(\d+)\.(\d+)[fba](\d+)$/m;
+        const pattern = /^(\d+)\.(\d+)\.(\d+)([fba])(\d+)$/m;
         const match = text.match(pattern);
         if (match == null) {
             throw new Error('文字列がUnityのバージョンパターンに一致しません。');
         }
-        const numbers = new Array(4);
-        for (let i = 0; i < match.length; i++) {
-            numbers[i] = parseInt(match[i + 1]);
-        }
-        return new UnityVersion(numbers[0], numbers[1], numbers[2], numbers[3]);
+        const first = parseInt(match[1]);
+        const second = parseInt(match[2]);
+        const third = parseInt(match[3]);
+        const releaseType = match[4].toString();
+        const fourth = parseInt(match[5]);
+        return new UnityVersion(first, second, third, fourth, releaseType);
     }
 }
 exports.UnityVersion = UnityVersion;
