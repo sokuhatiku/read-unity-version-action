@@ -691,6 +691,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -699,17 +702,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = __importDefault(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const unityVersionDescribedFile_1 = __webpack_require__(47);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const projectPath = core.getInput('projectPath') || process.env.GITHUB_WORKSPACE;
-            if (!projectPath) {
-                throw new Error('project path is undefined');
+            const projectPath = core.getInput('projectPath');
+            if (projectPath.startsWith('/')) {
+                throw new Error(`projectPath that rooted(${projectPath}) is not supported.`);
             }
-            console.log(`project path is "${projectPath}"`);
-            const versionFile = unityVersionDescribedFile_1.UnityVersionDescribedFile.ExploreSync(projectPath);
+            const workspacePath = process.env.GITHUB_WORKSPACE || '';
+            const rootedProjectPath = path_1.default.join(workspacePath, projectPath);
+            console.log(`project path is "${rootedProjectPath}"`);
+            const versionFile = unityVersionDescribedFile_1.UnityVersionDescribedFile.ExploreSync(rootedProjectPath);
             const version = versionFile.version;
             console.log(`project version is "${version}"`);
             core.setOutput('editorVersion', version.toString());

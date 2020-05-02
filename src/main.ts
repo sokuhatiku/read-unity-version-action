@@ -1,16 +1,20 @@
+import path from 'path'
 import * as core from '@actions/core'
 import {UnityVersionDescribedFile} from './unityVersionDescribedFile'
 
 async function run(): Promise<void> {
   try {
-    const projectPath =
-      core.getInput('projectPath') || process.env.GITHUB_WORKSPACE
-    if (!projectPath) {
-      throw new Error('project path is undefined')
+    const projectPath = core.getInput('projectPath')
+    if (projectPath.startsWith('/')) {
+      throw new Error(
+        `projectPath that rooted(${projectPath}) is not supported.`
+      )
     }
-    console.log(`project path is "${projectPath}"`)
+    const workspacePath = process.env.GITHUB_WORKSPACE || ''
+    const rootedProjectPath = path.join(workspacePath, projectPath)
+    console.log(`project path is "${rootedProjectPath}"`)
 
-    const versionFile = UnityVersionDescribedFile.ExploreSync(projectPath)
+    const versionFile = UnityVersionDescribedFile.ExploreSync(rootedProjectPath)
     const version = versionFile.version
 
     console.log(`project version is "${version}"`)

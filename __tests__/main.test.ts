@@ -3,70 +3,52 @@ import * as cp from 'child_process'
 import * as path from 'path'
 
 test('with projectPath input(5.6.1f1)', () => {
-  const customEnv: NodeJS.ProcessEnv = Object.assign(
-    {INPUT_PROJECTPATH: '__tests__/UnityProject_5.6.1f1'},
-    process.env
-  )
-  expect(execWithCustomEnv(customEnv)).toContain(
+  const customEnv: NodeJS.ProcessEnv = {
+    INPUT_PROJECTPATH: '__tests__/UnityProject_5.6.1f1'
+  }
+
+  expect(executeWithAdditionalEnv(customEnv)).toContain(
     '::set-output name=editorVersion::5.6.1f1'
   )
 })
 
 test('with projectPath input(2019.3.8f1)', () => {
-  const customEnv: NodeJS.ProcessEnv = Object.assign(
-    {INPUT_PROJECTPATH: '__tests__/UnityProject_2019.3.8f1'},
-    process.env
-  )
-  expect(execWithCustomEnv(customEnv)).toContain(
+  const customEnv: NodeJS.ProcessEnv = {
+    INPUT_PROJECTPATH: '__tests__/UnityProject_2019.3.8f1'
+  }
+
+  expect(executeWithAdditionalEnv(customEnv)).toContain(
     '::set-output name=editorVersion::2019.3.8f1'
   )
 })
 
-test('without projectPath input(5.6.1f1)', () => {
-  const customEnv: NodeJS.ProcessEnv = Object.assign(
-    {GITHUB_WORKSPACE: '__tests__/UnityProject_5.6.1f1'},
-    process.env
-  )
-  expect(execWithCustomEnv(customEnv)).toContain(
-    '::set-output name=editorVersion::5.6.1f1'
+test('with rooted path input', () => {
+  const customEnv: NodeJS.ProcessEnv = {
+    INPUT_PROJECTPATH: '/test-rooted-path'
+  }
+
+  expect(executeWithAdditionalEnv(customEnv)).toContain(
+    '::error::projectPath that rooted(/test-rooted-path) is not supported.'
   )
 })
 
-test('without projectPath input(2019.3.8f1)', () => {
-  const customEnv: NodeJS.ProcessEnv = Object.assign(
-    {GITHUB_WORKSPACE: '__tests__/UnityProject_2019.3.8f1'},
-    process.env
-  )
-  expect(execWithCustomEnv(customEnv)).toContain(
+test('without path input(github workspace input)', () => {
+  const customEnv: NodeJS.ProcessEnv = {
+    GITHUB_WORKSPACE: '__tests__/UnityProject_2019.3.8f1'
+  }
+
+  expect(executeWithAdditionalEnv(customEnv)).toContain(
     '::set-output name=editorVersion::2019.3.8f1'
   )
 })
 
-test('without anything', () => {
-  const customEnv: NodeJS.ProcessEnv = process.env
-  expect(() => execWithCustomEnv(customEnv)).toThrowError()
-})
-
-test('with invalid directory', () => {
-  const customEnv: NodeJS.ProcessEnv = Object.assign(
-    {INPUT_PROJECTPATH: '__tests__/UnityProject_NotExistsProject'},
-    process.env
-  )
-  expect(() => execWithCustomEnv(customEnv)).toThrowError()
-})
-
-test('with invalid format', () => {
-  const customEnv: NodeJS.ProcessEnv = Object.assign(
-    {INPUT_PROJECTPATH: '__tests__/UnityProject_InvalidVersionFormat'},
-    process.env
-  )
-  expect(() => execWithCustomEnv(customEnv)).toThrowError()
-})
-
-function execWithCustomEnv(customEnv: NodeJS.ProcessEnv): string {
+function executeWithAdditionalEnv(additionalEnv: NodeJS.ProcessEnv): string {
+  const customEnv: NodeJS.ProcessEnv = Object.assign(additionalEnv, process.env)
   const ip = path.join(__dirname, '..', 'lib', 'main.js')
   const options: cp.ExecSyncOptions = {
-    env: Object.assign(customEnv, process.env)
+    env: customEnv
   }
-  return cp.execSync(`node ${ip}`, options).toString()
+
+  const result = cp.spawnSync('node', [ip], options)
+  return result.output.toString()
 }
