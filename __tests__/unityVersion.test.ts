@@ -14,9 +14,9 @@ test('Unity 2017 or lator Versioning', () => {
   UnityVersion.Parse('2019.3.12f1')
 })
 
-test('Beta or alpha releases are not supported', () => {
-  expect(() => UnityVersion.Parse('2020.1.0b7')).toThrowError()
-  expect(() => UnityVersion.Parse('2020.2.0a9')).toThrowError()
+test('Beta and alpha releases', () => {
+  UnityVersion.Parse('2020.1.0b7')
+  UnityVersion.Parse('2020.2.0a9')
 })
 
 test('Unity 4 or earyer releases are not supported', () => {
