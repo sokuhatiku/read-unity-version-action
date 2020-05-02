@@ -1,27 +1,55 @@
-import {wait} from '../src/wait'
 import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10)
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number')
+test('with projectPath input(5.6.1f1)', () => {
+  const customEnv: NodeJS.ProcessEnv = {
+    INPUT_PROJECTPATH: '__tests__/UnityProject_5.6.1f1'
+  }
+
+  expect(executeWithAdditionalEnv(customEnv)).toContain(
+    'project version is [5.6.1f1]'
+  )
 })
 
-test('wait 500 ms', async () => {
-  const start = new Date()
-  await wait(500)
-  const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
-  expect(delta).toBeGreaterThan(450)
+test('with projectPath input(2019.3.8f1)', () => {
+  const customEnv: NodeJS.ProcessEnv = {
+    INPUT_PROJECTPATH: '__tests__/UnityProject_2019.3.8f1'
+  }
+
+  expect(executeWithAdditionalEnv(customEnv)).toContain(
+    'project version is [2019.3.8f1]'
+  )
 })
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500'
+test('with rooted path input', () => {
+  const customEnv: NodeJS.ProcessEnv = {
+    INPUT_PROJECTPATH: '/test-rooted-path'
+  }
+
+  expect(executeWithAdditionalEnv(customEnv)).toContain(
+    'projectPath that rooted(/test-rooted-path) is not supported.'
+  )
+})
+
+// broken on remote
+test.skip('without path input(github workspace input)', () => {
+  const customEnv: NodeJS.ProcessEnv = {
+    GITHUB_WORKSPACE: '__tests__/UnityProject_2019.3.8f1'
+  }
+
+  expect(executeWithAdditionalEnv(customEnv)).toContain(
+    'project version is [2019.3.8f1]'
+  )
+})
+
+function executeWithAdditionalEnv(additionalEnv: NodeJS.ProcessEnv): string {
+  const customEnv: NodeJS.ProcessEnv = Object.assign(additionalEnv, process.env)
   const ip = path.join(__dirname, '..', 'lib', 'main.js')
   const options: cp.ExecSyncOptions = {
-    env: process.env
+    env: customEnv
   }
-  console.log(cp.execSync(`node ${ip}`, options).toString())
-})
+
+  const result = cp.spawnSync('node', [ip], options)
+  return result.output.toString()
+}

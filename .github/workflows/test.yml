@@ -3,6 +3,7 @@ on: # rebuild any PRs and main branch changes
   pull_request:
   push:
     branches:
+      - develop
       - master
       - 'releases/*'
 
@@ -20,4 +21,7 @@ jobs:
     - uses: actions/checkout@v1
     - uses: ./
       with: 
-        milliseconds: 1000
+        projectPath: __tests__/UnityProject_5.6.1f1
+    - uses: ./
+      with: 
+        projectPath: __tests__/UnityProject_2019.3.8f1

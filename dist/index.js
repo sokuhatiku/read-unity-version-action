@@ -420,6 +420,51 @@ module.exports = new Type('tag:yaml.org,2002:int', {
 
 /***/ }),
 
+/***/ 47:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = __importDefault(__webpack_require__(622));
+const js_yaml_1 = __importDefault(__webpack_require__(414));
+const fs_1 = __importDefault(__webpack_require__(747));
+const unityVersion_1 = __webpack_require__(946);
+class UnityVersionDescribedFile {
+    constructor(filePath) {
+        this.filePath = filePath;
+        try {
+            const fileContent = fs_1.default.readFileSync(filePath).toString();
+            const yamlData = js_yaml_1.default.safeLoad(fileContent);
+            const versionValue = yamlData['m_EditorVersion'];
+            if (versionValue == null) {
+                throw Error('Version value is not defined.');
+            }
+            this.version = unityVersion_1.UnityVersion.Parse(versionValue);
+        }
+        catch (error) {
+            throw new Error(`Version described file(${filePath}) has invalid format.\n${error}`);
+        }
+    }
+    static ExploreSync(projectRootPath) {
+        const targetPath = path_1.default.join(projectRootPath, 'ProjectSettings/ProjectVersion.txt');
+        try {
+            fs_1.default.accessSync(targetPath);
+        }
+        catch (error) {
+            throw new Error(`Version described file(${targetPath}) did not found.`);
+        }
+        return new UnityVersionDescribedFile(targetPath);
+    }
+}
+exports.UnityVersionDescribedFile = UnityVersionDescribedFile;
+
+
+/***/ }),
+
 /***/ 82:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -658,6 +703,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -665,28 +713,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(__webpack_require__(470));
 const path_1 = __importDefault(__webpack_require__(622));
-const js_yaml_1 = __importDefault(__webpack_require__(414));
-const fs_1 = __importDefault(__webpack_require__(747));
+const core = __importStar(__webpack_require__(470));
+const unityVersionDescribedFile_1 = __webpack_require__(47);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const projectPath = core.getInput('projectPath') || process.env.GITHUB_WORKSPACE;
-            if (!projectPath) {
-                throw new Error('project path is undefined');
+            const projectPath = core.getInput('projectPath');
+            if (projectPath.startsWith('/')) {
+                throw new Error(`projectPath that rooted(${projectPath}) is not supported.`);
             }
-            console.log(`project path is \"${projectPath}\"`);
-            const versionFilePath = path_1.default.join(projectPath, 'ProjectSettings/ProjectVersion.txt');
-            const contents = fs_1.default.readFileSync(versionFilePath).toString();
-            const parsed = js_yaml_1.default.safeLoad(contents);
-            const editorVersion = parsed.m_EditorVersion;
-            console.log(`project version is \"${editorVersion}\"`);
-            core.setOutput('editorVersion', editorVersion);
+            const workspacePath = process.env.GITHUB_WORKSPACE || '';
+            const rootedProjectPath = path_1.default.join(workspacePath, projectPath);
+            console.log(`project path is ${rootedProjectPath}`);
+            const versionFile = unityVersionDescribedFile_1.UnityVersionDescribedFile.ExploreSync(rootedProjectPath);
+            const version = versionFile.version;
+            console.log(`project version is [${version}]`);
+            core.setOutput('editorVersion', version.toString());
         }
         catch (error) {
             core.setFailed(error.message);
@@ -1021,17 +1065,24 @@ module.exports = new Type('tag:yaml.org,2002:float', {
 
 "use strict";
 
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const os = __webpack_require__(87);
+const os = __importStar(__webpack_require__(87));
 /**
  * Commands
  *
  * Command Format:
- *   ##[name key=value;key=value]message
+ *   ::name key=value,key=value::message
  *
  * Examples:
- *   ##[warning]This is the user warning message
- *   ##[set-secret name=mypassword]definitelyNotAPassword!
+ *   ::warning::This is the message
+ *   ::set-env name=MY_VAR::some value
  */
 function issueCommand(command, properties, message) {
     const cmd = new Command(command, properties, message);
@@ -1056,34 +1107,39 @@ class Command {
         let cmdStr = CMD_STRING + this.command;
         if (this.properties && Object.keys(this.properties).length > 0) {
             cmdStr += ' ';
+            let first = true;
             for (const key in this.properties) {
                 if (this.properties.hasOwnProperty(key)) {
                     const val = this.properties[key];
                     if (val) {
-                        // safely append the val - avoid blowing up when attempting to
-                        // call .replace() if message is not a string for some reason
-                        cmdStr += `${key}=${escape(`${val || ''}`)},`;
+                        if (first) {
+                            first = false;
+                        }
+                        else {
+                            cmdStr += ',';
+                        }
+                        cmdStr += `${key}=${escapeProperty(val)}`;
                     }
                 }
             }
         }
-        cmdStr += CMD_STRING;
-        // safely append the message - avoid blowing up when attempting to
-        // call .replace() if message is not a string for some reason
-        const message = `${this.message || ''}`;
-        cmdStr += escapeData(message);
+        cmdStr += `${CMD_STRING}${escapeData(this.message)}`;
         return cmdStr;
     }
 }
 function escapeData(s) {
-    return s.replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+    return (s || '')
+        .replace(/%/g, '%25')
+        .replace(/\r/g, '%0D')
+        .replace(/\n/g, '%0A');
 }
-function escape(s) {
-    return s
+function escapeProperty(s) {
+    return (s || '')
+        .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
-        .replace(/]/g, '%5D')
-        .replace(/;/g, '%3B');
+        .replace(/:/g, '%3A')
+        .replace(/,/g, '%2C');
 }
 //# sourceMappingURL=command.js.map
 
@@ -2736,10 +2792,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const command_1 = __webpack_require__(431);
-const os = __webpack_require__(87);
-const path = __webpack_require__(622);
+const os = __importStar(__webpack_require__(87));
+const path = __importStar(__webpack_require__(622));
 /**
  * The code to exit an action
  */
@@ -2825,6 +2888,13 @@ exports.setFailed = setFailed;
 //-----------------------------------------------------------------------
 // Logging Commands
 //-----------------------------------------------------------------------
+/**
+ * Gets whether Actions Step Debug is on or not
+ */
+function isDebug() {
+    return process.env['RUNNER_DEBUG'] === '1';
+}
+exports.isDebug = isDebug;
 /**
  * Writes debug message to user log
  * @param message debug message
@@ -4436,6 +4506,42 @@ function Type(tag, options) {
 }
 
 module.exports = Type;
+
+
+/***/ }),
+
+/***/ 946:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+class UnityVersion {
+    constructor(first, second, third, fourth, releaseType) {
+        this.first = first;
+        this.second = second;
+        this.third = third;
+        this.fourth = fourth;
+        this.releaseType = releaseType;
+    }
+    toString() {
+        return `${this.first}.${this.second}.${this.third}${this.releaseType}${this.fourth}`;
+    }
+    static Parse(text) {
+        const pattern = /^(\d+)\.(\d+)\.(\d+)([fba])(\d+)$/m;
+        const match = text.match(pattern);
+        if (match == null) {
+            throw new Error('version value did not match avaiable/supported version format.');
+        }
+        const first = parseInt(match[1]);
+        const second = parseInt(match[2]);
+        const third = parseInt(match[3]);
+        const releaseType = match[4].toString();
+        const fourth = parseInt(match[5]);
+        return new UnityVersion(first, second, third, fourth, releaseType);
+    }
+}
+exports.UnityVersion = UnityVersion;
 
 
 /***/ }),
