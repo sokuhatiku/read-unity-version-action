@@ -1,6 +1,6 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Read unity version'
+description: 'A GitHub action to reads Unity editor version requested by project.'
+author: 'Sokuhatiku'
 inputs:
   projectPath:
     required: false
