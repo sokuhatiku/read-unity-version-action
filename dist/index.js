@@ -714,10 +714,10 @@ function run() {
             }
             const workspacePath = process.env.GITHUB_WORKSPACE || '';
             const rootedProjectPath = path_1.default.join(workspacePath, projectPath);
-            console.log(`project path is "${rootedProjectPath}"`);
+            console.log(`project path is ${rootedProjectPath}`);
             const versionFile = unityVersionDescribedFile_1.UnityVersionDescribedFile.ExploreSync(rootedProjectPath);
             const version = versionFile.version;
-            console.log(`project version is "${version}"`);
+            console.log(`project version is [${version}]`);
             core.setOutput('editorVersion', version.toString());
         }
         catch (error) {

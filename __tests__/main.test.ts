@@ -8,7 +8,7 @@ test('with projectPath input(5.6.1f1)', () => {
   }
 
   expect(executeWithAdditionalEnv(customEnv)).toContain(
-    '::set-output name=editorVersion::5.6.1f1'
+    'project version is [5.6.1f1]'
   )
 })
 
@@ -18,7 +18,7 @@ test('with projectPath input(2019.3.8f1)', () => {
   }
 
   expect(executeWithAdditionalEnv(customEnv)).toContain(
-    '::set-output name=editorVersion::2019.3.8f1'
+    'project version is [2019.3.8f1]'
   )
 })
 
@@ -28,7 +28,7 @@ test('with rooted path input', () => {
   }
 
   expect(executeWithAdditionalEnv(customEnv)).toContain(
-    '::error::projectPath that rooted(/test-rooted-path) is not supported.'
+    'projectPath that rooted(/test-rooted-path) is not supported.'
   )
 })
 
@@ -38,7 +38,7 @@ test('without path input(github workspace input)', () => {
   }
 
   expect(executeWithAdditionalEnv(customEnv)).toContain(
-    '::set-output name=editorVersion::2019.3.8f1'
+    'project version is [2019.3.8f1]'
   )
 })
 

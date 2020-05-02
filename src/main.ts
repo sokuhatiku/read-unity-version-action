@@ -12,12 +12,12 @@ async function run(): Promise<void> {
     }
     const workspacePath = process.env.GITHUB_WORKSPACE || ''
     const rootedProjectPath = path.join(workspacePath, projectPath)
-    console.log(`project path is "${rootedProjectPath}"`)
+    console.log(`project path is ${rootedProjectPath}`)
 
     const versionFile = UnityVersionDescribedFile.ExploreSync(rootedProjectPath)
     const version = versionFile.version
 
-    console.log(`project version is "${version}"`)
+    console.log(`project version is [${version}]`)
     core.setOutput('editorVersion', version.toString())
   } catch (error) {
     core.setFailed(error.message)
