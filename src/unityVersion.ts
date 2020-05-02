@@ -6,7 +6,7 @@ export class UnityVersion {
     private fourth: Number
   ) {}
 
-  public toString(): string {
+  toString(): string {
     return `${this.first}.${this.second}.${this.third}f${this.fourth}`
   }
 
@@ -18,7 +18,7 @@ export class UnityVersion {
       throw new Error('文字列がUnityのバージョンパターンに一致しません。')
     }
 
-    let numbers: Number[] = new Array(4)
+    const numbers: Number[] = new Array(4)
     for (let i = 0; i < match.length; i++) {
       numbers[i] = parseInt(match[i + 1])
     }
