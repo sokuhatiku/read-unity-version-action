@@ -16,7 +16,9 @@ export class UnityVersion {
 
     const match = text.match(pattern)
     if (match == null) {
-      throw new Error('文字列がUnityのバージョンパターンに一致しません。')
+      throw new Error(
+        'version value did not match avaiable/supported version format.'
+      )
     }
 
     const first = parseInt(match[1])

@@ -443,7 +443,7 @@ class UnityVersionDescribedFile {
     static ExploreSync(projectRootPath) {
         const targetPath = path_1.default.join(projectRootPath, 'ProjectSettings/ProjectVersion.txt');
         if (!fs_1.default.existsSync(targetPath)) {
-            throw new Error('対象ファイルを発見出来ませんでした。');
+            throw new Error(`Version described file(${targetPath}) did not found.`);
         }
         return new UnityVersionDescribedFile(targetPath);
     }
@@ -4519,7 +4519,7 @@ class UnityVersion {
         const pattern = /^(\d+)\.(\d+)\.(\d+)([fba])(\d+)$/m;
         const match = text.match(pattern);
         if (match == null) {
-            throw new Error('文字列がUnityのバージョンパターンに一致しません。');
+            throw new Error('version value did not match avaiable/supported version format.');
         }
         const first = parseInt(match[1]);
         const second = parseInt(match[2]);

@@ -20,7 +20,7 @@ export class UnityVersionDescribedFile {
     )
 
     if (!fs.existsSync(targetPath)) {
-      throw new Error('対象ファイルを発見出来ませんでした。')
+      throw new Error(`Version described file(${targetPath}) did not found.`)
     }
 
     return new UnityVersionDescribedFile(targetPath)
