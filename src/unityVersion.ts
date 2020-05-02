@@ -1,6 +1,10 @@
 export class UnityVersion {
-    constructor(private first: Number, private second: Number, private third: Number, private fourth: Number) {
+    private constructor(private first: Number, private second: Number, private third: Number, private fourth: Number) {
 
+    }
+
+    public toString(): string {
+        return `${this.first}.${this.second}.${this.third}f${this.fourth}`
     }
 
     static Parse(text: String): UnityVersion {
