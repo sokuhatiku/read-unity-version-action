@@ -8,7 +8,7 @@ test('with projectPath input(5.6.1f1)', () => {
     process.env
   )
   expect(execWithCustomEnv(customEnv))
-    .toContain('::set-output name=editorVersion,::5.6.1f1')
+    .toContain('::set-output name=editorVersion::5.6.1f1')
 })
 
 test('with projectPath input(2019.3.8f1)', () => {
@@ -17,7 +17,7 @@ test('with projectPath input(2019.3.8f1)', () => {
     process.env
   )
   expect(execWithCustomEnv(customEnv))
-    .toContain('::set-output name=editorVersion,::2019.3.8f1')
+    .toContain('::set-output name=editorVersion::2019.3.8f1')
 })
 
 test('without projectPath input(5.6.1f1)', () => {
@@ -26,7 +26,7 @@ test('without projectPath input(5.6.1f1)', () => {
     process.env
   )
   expect(execWithCustomEnv(customEnv))
-    .toContain('::set-output name=editorVersion,::5.6.1f1')
+    .toContain('::set-output name=editorVersion::5.6.1f1')
 })
 
 test('without projectPath input(2019.3.8f1)', () => {
@@ -35,7 +35,7 @@ test('without projectPath input(2019.3.8f1)', () => {
     process.env
   )
   expect(execWithCustomEnv(customEnv))
-    .toContain('::set-output name=editorVersion,::2019.3.8f1')
+    .toContain('::set-output name=editorVersion::2019.3.8f1')
 })
 
 test('without anything', () => {
