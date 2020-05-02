@@ -436,9 +436,18 @@ const unityVersion_1 = __webpack_require__(946);
 class UnityVersionDescribedFile {
     constructor(filePath) {
         this.filePath = filePath;
-        const fileContent = fs_1.default.readFileSync(filePath).toString();
-        const yamlData = js_yaml_1.default.safeLoad(fileContent);
-        this.version = unityVersion_1.UnityVersion.Parse(yamlData['m_EditorVersion']);
+        try {
+            const fileContent = fs_1.default.readFileSync(filePath).toString();
+            const yamlData = js_yaml_1.default.safeLoad(fileContent);
+            const versionValue = yamlData['m_EditorVersion'];
+            if (versionValue == null) {
+                throw Error('Version value is not defined.');
+            }
+            this.version = unityVersion_1.UnityVersion.Parse(versionValue);
+        }
+        catch (error) {
+            throw new Error(`Version described file(${filePath}) has invalid format.\n${error}`);
+        }
     }
     static ExploreSync(projectRootPath) {
         const targetPath = path_1.default.join(projectRootPath, 'ProjectSettings/ProjectVersion.txt');

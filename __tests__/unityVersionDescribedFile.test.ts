@@ -13,7 +13,7 @@ test('not exists project', () => {
     UnityVersionDescribedFile.ExploreSync(
       '__tests__/UnityProject_NotExistsProject'
     )
-  ).toThrowError()
+  ).toThrowError(/Version described file\(.*\) did not found\./)
 })
 
 test('invalid format project', () => {
@@ -21,5 +21,5 @@ test('invalid format project', () => {
     UnityVersionDescribedFile.ExploreSync(
       '__tests__/UnityProject_InvalidVersionFormat'
     )
-  ).toThrowError()
+  ).toThrowError(/Version described file\(.*\) has invalid format\./)
 })

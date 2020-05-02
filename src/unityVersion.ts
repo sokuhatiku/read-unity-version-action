@@ -11,7 +11,7 @@ export class UnityVersion {
     return `${this.first}.${this.second}.${this.third}${this.releaseType}${this.fourth}`
   }
 
-  static Parse(text: String): UnityVersion {
+  static Parse(text: string): UnityVersion {
     const pattern = /^(\d+)\.(\d+)\.(\d+)([fba])(\d+)$/m
 
     const match = text.match(pattern)

@@ -7,10 +7,20 @@ export class UnityVersionDescribedFile {
   readonly version: UnityVersion
 
   private constructor(readonly filePath: string) {
-    const fileContent = fs.readFileSync(filePath).toString()
-    const yamlData = yaml.safeLoad(fileContent)
+    try {
+      const fileContent = fs.readFileSync(filePath).toString()
+      const yamlData = yaml.safeLoad(fileContent)
 
-    this.version = UnityVersion.Parse(yamlData['m_EditorVersion'])
+      const versionValue: string = yamlData['m_EditorVersion']
+      if (versionValue == null) {
+        throw Error('Version value is not defined.')
+      }
+      this.version = UnityVersion.Parse(versionValue)
+    } catch (error) {
+      throw new Error(
+        `Version described file(${filePath}) has invalid format.\n${error}`
+      )
+    }
   }
 
   static ExploreSync(projectRootPath: string): UnityVersionDescribedFile {
