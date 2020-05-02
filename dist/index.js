@@ -451,7 +451,10 @@ class UnityVersionDescribedFile {
     }
     static ExploreSync(projectRootPath) {
         const targetPath = path_1.default.join(projectRootPath, 'ProjectSettings/ProjectVersion.txt');
-        if (!fs_1.default.existsSync(targetPath)) {
+        try {
+            fs_1.default.accessSync(targetPath);
+        }
+        catch (error) {
             throw new Error(`Version described file(${targetPath}) did not found.`);
         }
         return new UnityVersionDescribedFile(targetPath);
