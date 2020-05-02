@@ -1,34 +1,24 @@
-import * as core from '@actions/core'
 import path from 'path'
-import yaml from 'js-yaml'
-import fs from 'fs'
+import * as core from '@actions/core'
+import {UnityVersionDescribedFile} from './unityVersionDescribedFile'
 
 async function run(): Promise<void> {
   try {
-    const projectPath = core.getInput('projectPath') || process.env.GITHUB_WORKSPACE;
-    if(!projectPath)
-    {
-      throw new Error('project path is undefined');
+    const projectPath = core.getInput('projectPath')
+    if (projectPath.startsWith('/')) {
+      throw new Error(
+        `projectPath that rooted(${projectPath}) is not supported.`
+      )
     }
-    console.log(`project path is "${projectPath}"`);
+    const workspacePath = process.env.GITHUB_WORKSPACE || ''
+    const rootedProjectPath = path.join(workspacePath, projectPath)
+    console.log(`project path is ${rootedProjectPath}`)
 
-    const versionFilePath =  path.join(projectPath, 'ProjectSettings/ProjectVersion.txt');
-    if(!fs.existsSync(versionFilePath))
-    {
-      throw new Error('The version file not exists. Project is not exists or invalid format.')
-    }
-    const contents = fs.readFileSync(versionFilePath).toString();
-    const parsed = yaml.safeLoad(contents);
-    const editorVersion = parsed.m_EditorVersion as string;
-    const unityVersionPattern = /^\d+\.\d+\.\d+f\d+$/m;
-    if(!unityVersionPattern.test(editorVersion))
-    {
-      throw new Error('Read version failed. Project is not exists or invalid format.')
-    }
-    console.log(`project version is "${editorVersion}"`);
+    const versionFile = UnityVersionDescribedFile.ExploreSync(rootedProjectPath)
+    const version = versionFile.version
 
-    core.setOutput('editorVersion', editorVersion);
-
+    console.log(`project version is [${version}]`)
+    core.setOutput('editorVersion', version.toString())
   } catch (error) {
     core.setFailed(error.message)
   }
