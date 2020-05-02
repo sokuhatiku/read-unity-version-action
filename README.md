@@ -2,7 +2,9 @@
 
 # Read unity version action
 
-This action gets the version of Unity Editor required by your project and make it usable at later steps.
+This action gets the version of Unity Editor required by your project and make it usable at after steps.
+
+Supports Unity 5 or later project.
 
 ## Inputs
 
@@ -15,12 +17,12 @@ Default is root of repository.
 
 ### `editorVersion`
 
-The version to required.
+The version required by project.
 
 ## Example usage
 
 ```
 uses: sokuhatiku/read-unity-version-action@v1
 with:
-  projectPath: './unity-project'
+  projectPath: 'your-unity-project'
 ```
