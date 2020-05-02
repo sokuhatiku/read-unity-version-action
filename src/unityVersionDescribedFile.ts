@@ -29,7 +29,9 @@ export class UnityVersionDescribedFile {
       'ProjectSettings/ProjectVersion.txt'
     )
 
-    if (!fs.existsSync(targetPath)) {
+    try{
+      fs.accessSync(targetPath)
+    } catch (error) {
       throw new Error(`Version described file(${targetPath}) did not found.`)
     }
 
